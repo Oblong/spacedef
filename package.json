@@ -1,0 +1,15 @@
+{
+  "name": "spacedef",
+  "version": "1.0.0",
+  "description": "Functions for working with feld/screen/room proteins and spacefiles",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Brandon Harvey",
+  "license": "MIT",
+  "dependencies": {
+    "immutable": "^3.8.1",
+    "javlin-pure": "0.0.1"
+  }
+}
