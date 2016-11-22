@@ -6,7 +6,7 @@ var _ = require('lodash');
 //  - arg null, undefined, not a map, or an empty map
 //  - 'defaults' key is present but nothing else
 function validate_viewports_attributes(viewports) {
-    if (!i.Map.isMap(viewports)) {
+    if (!_.isObject(viewports)) {
         console.log('viewports attributes map is not a map.');
         return false;
     }
@@ -32,10 +32,10 @@ function validate_viewports_attributes(viewports) {
 //  - That list or string mentions a viewport which isn't included
 //    in in the viewports collection
 function validate_windows_attributes(windows, viewports) {
-    if (!i.Map.isMap(windows)) {
+    if (!_.isObject(windows)) {
         console.log('windows attributes map is not a map.');
     }
-    if (!i.Map.isMap(viewports)) {
+    if (!_.isObject(viewports)) {
         console.log('viewports attributes map is not a map.');
     }
 
@@ -120,10 +120,10 @@ function validate_windows_attributes(windows, viewports) {
 //  - machines list has more than one principal=true
 // TODO: assume that windows is already valid?  Validate it here?
 function validate_space_attributes(space, windows) {
-    if (!i.Map.isMap(space)) {
+    if (!_.isObject(space)) {
         console.log('space attributes map is not a map.');
     }
-    if (!i.Map.isMap(windows)) {
+    if (!_.isObject(windows)) {
         console.log('windows attributes map is not a map.');
     }
 
@@ -135,7 +135,7 @@ function validate_space_attributes(space, windows) {
         return false;
     }
 
-    if (!i.List.isList(o.space.machines)) {
+    if (!_.isArray(o.space.machines)) {
         console.log('machines list is not a list.');
         return false;
     }
@@ -187,7 +187,7 @@ function validate_space_attributes(space, windows) {
 function validate_space_defn(o) {
     console.log('Validating space definition.');
 
-    if (!i.Map.isMap(o)) {
+    if (!_.isObject(o)) {
         console.log('space definition map is not a map.');
         return false;
     }
