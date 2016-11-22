@@ -1,76 +1,227 @@
 let vec = require('javlin-pure');
 var i = require('immutable');
+var _ = require('lodash');
 
-function validate_windows_section(y) {
-    if (!y || !y.viewports || !y.windows)
+// Returns false if:
+//  - arg null, undefined, not a map, or an empty map
+//  - 'defaults' key is present but nothing else
+function validate_viewports_attributes(viewports) {
+    if (!i.Map.isMap(viewports)) {
+        console.log('viewports attributes map is not a map.');
         return false;
+    }
+
+    let viewport_map = i.Map(viewports);
+
+    if (viewports_map.size == 0) {
+        console.log('No viewports defined.');
+        return false;
+    }
+
+    if (viewports_map.includes('defaults') && viewports_map.size == 1) {
+        console.log('No viewports defined, just some default attributes.');
+        return false;
+    }
+    return true;
+}
+
+// Returns false if:
+//  - args are null, undefined, not a map, or an empty map
+//  - 'defaults' key is present but nothing else
+//  - any item in windows object lacks 'viewports' list or string
+//  - That list or string mentions a viewport which isn't included
+//    in in the viewports collection
+function validate_windows_attributes(windows, viewports) {
+    if (!i.Map.isMap(windows)) {
+        console.log('windows attributes map is not a map.');
+    }
+    if (!i.Map.isMap(viewports)) {
+        console.log('viewports attributes map is not a map.');
+    }
+
+    let viewport_map = i.Map(viewports);
+    let windows_map = i.Map(windows);
+
+    if (windows_map.size == 0) {
+        console.log('No windows defined.');
+        return false;
+    }
+
+    if (viewports_map.size == 0) {
+        console.log('No viewports defined.');
+        return false;
+    }
+
+    if (windows_map.includes('defaults') && windows_map.size == 1) {
+        console.log('No windows defined, just some default attributes.');
+        return false;
+    }
 
     let windows_ok = true;
-    let vs = i.Map(y.viewports);
-    let ws = i.Map(y.windows);
 
-    // Vet every window entry
-    ws.forEach((w, key) => {
-        // Each window must specify viewports list      
-        if (!w.viewports || w.viewports.length == 0) {
-            console.log('window definition [', key,
-                '] lacks viewport list.');
+    // Vet every window entry individually -- continue through all
+    // in case of failure
+    windows_map.forEach((w, key) => {
+
+        // must have viewports attribute
+        if (_.isNil(w.viewports)) {
+            console.log('Window definition [', key,
+                '] lacks viewports attribute.');
+            windows_ok = false;
+            return;
+        }
+
+        // Each window must specify viewports list (or a string)
+        if (_.isString(w.viewports)) {
+
+            if (!viewport_map.has(w.viewports)) {
+                console.log('Window definition [', key,
+                    '] refers to a viewport which is missing from the viewports collection: ',
+                    w.viewports);
+                windows_ok = false;
+            }
+
+        } else if (_.isArray(w.viewports)) {
+            if (w.viewports.length == 0) {
+                console.log('Window definition [', key,
+                    '] viewports array length is 0.');
+                windows_ok = false;
+                return;
+            }
+
+            viewport_names = i.List(w.viewports);
+
+            // Select for viewport names which DON'T appear previously.
+            let missings = viewport_names.valueSeq().filter(nom => !
+                viewport_map.has(nom)).toJS();
+
+            // Each item in viewports list must appear in prior viewports collection.
+            if (missings.length > 0) {
+                console.log('window definition [', key,
+                    '] refers to viewport(s) which are missing from the viewports collection: ',
+                    missings);
+                windows_ok = false;
+            }
+
+        } else {
+            console.log('window defn [', key,
+                '] viewports attribute is not array or string.');
             windows_ok = false;
         }
 
-        vps = i.List(w.viewports);
-
-        // Each item in viewports list must appear in top-level viewports collection.
-        // Select for viewport names which DON'T appear previously.
-        let missings = vps.valueSeq().filter(vname => !vs.has(vname)).toJS();
-        if (missings.length > 0) {
-            console.log('window definition [', key,
-                '] refers to viewport(s) which are missing from the viewports collection: ',
-                missings);
-            windows_ok = false;
-        }
     });
     return windows_ok;
 }
 
-function validate_space_section(y) {
-    if (!y || !y.viewports || !y.windows)
-        return false;
 
-    // Missing space section completely is OK
-    if (!y.space || !y.space.machines)
-        return true;
+// Returns false if:
+//  - args are null, undefined, not a map, or an empty map
+//  - machines list not a list, or empty
+//  - machines list has more than one principal=true
+// TODO: assume that windows is already valid?  Validate it here?
+function validate_space_attributes(space, windows) {
+    if (!i.Map.isMap(space)) {
+        console.log('space attributes map is not a map.');
+    }
+    if (!i.Map.isMap(windows)) {
+        console.log('windows attributes map is not a map.');
+    }
+
+    let space_map = i.Map(space);
+    let windows_map = i.Map(windows);
+
+    if (space_map.size == 0) {
+        console.log('Space attributes map empty.');
+        return false;
+    }
+
+    if (!i.List.isList(o.space.machines)) {
+        console.log('machines list is not a list.');
+        return false;
+    }
+
+    let ms = i.List(o.space.machines);
+    if (ms.size == 0) {
+        console.log('machines list is empty.');
+        return false;
+    }
 
     let space_ok = true;
+    let principal_count = 0;
+    let ws = i.Map(o.windows);
 
-    let vs = i.Map(y.viewports);
-    let ws = i.Map(y.windows);
-    let ms = i.List(y.space.machines);
+    // Vet every window entry
+    ms.forEach((m, key) => {
+        if (m.principal)
+            principal_count += 1;
 
-    // Vet every machine entry
-    ms.forEach(m => {
-        let wins = i.List(m.windows);
-
-        // Each item in windows list must appear in top-level windows collection.
         // Select for window names which DON'T appear previously.
-        let missings = wins.valueSeq().filter(wname => !ws.has(wname)).toJS();
+        let wins = i.List(m.windows);
+        let missings = wins.valueSeq().filter(nom => !windows_map.has(
+            nom)).toJS();
+
+        // Each item in a machine's windows list must appear in 
+        // windows collection.
         if (missings.length > 0) {
             console.log('Machine definition [', m.name,
                 '] refers to window(s) which are missing from the windows collection: ',
                 missings);
             space_ok = false;
         }
+
     });
+
+    if (principal_count > 1) {
+        console.log('More than one machine marked as principal');
+        return false;
+    }
     return space_ok;
 }
 
-function validate_space_yaml(y) {
-    if (!y || !y.viewports || !y.windows)
+
+// Returns false if:
+//  - argumentis null, undefined, not a map, or an empty map
+//  - windows is present but viewports not present
+//  - space is present, but viewports or windows not present
+//  - any section doesn't validate using functions defined above
+function validate_space_defn(o) {
+    console.log('Validating space definition.');
+
+    if (!i.Map.isMap(o)) {
+        console.log('space definition map is not a map.');
         return false;
-    console.log('Validating space.yaml');
-    let w = validate_windows_section(y);
-    let s = validate_space_section(y);
-    return w && s;
+    }
+
+    let defn = i.Map(o);
+    if (defn.size == 0) {
+        console.log('space definition empty.');
+        return false;
+    }
+
+    if (defn.has('windows')) {
+        if (!defn.has('viewports')) {
+            console.log('"windows" section requires a viewports section.');
+            return false;
+        }
+
+        if (!validate_viewports_attributes(o.viewports))
+            return false;
+
+        if (!validate_windows_attributes(o.windows, o.viewports))
+            return false;
+    }
+
+    if (defn.has('space')) {
+        if (!defn.has('windows')) {
+            console.log('"space" section requires a windows section.');
+            return false;
+        }
+
+        if (!validate_space_attributes(o.space, o.windows))
+            return false;
+    }
+
+    return true;
 }
 
 // Given a JSON representation of a space.yaml file, 
@@ -81,7 +232,7 @@ function validate_space_yaml(y) {
 // Global defaults instantiated the same way.
 // If there is no 'viewports' entry at all, a 'defaultviewport'
 // will be returned.
-function viewports_from_space_yaml(y) {
+function viewports_from_space_defn(y) {
     if (!y || !y.viewports)
         return {
             defaultviewport: default_viewport()
@@ -106,7 +257,7 @@ function viewports_from_space_yaml(y) {
 // Global defaults instantiated the same way.
 // If there is no 'windows' entry at all, one default 'main' window 
 // will be returned.
-function windows_from_space_yaml(y) {
+function windows_from_space_defn(y) {
     if (!y || !y.windows)
         return {
             main: default_window()
@@ -420,21 +571,27 @@ function default_space() {
     };
 }
 
-// Functions for working with space.yaml file
-exports.validate_space_yaml = validate_space_yaml;
-exports.viewports_from_space_yaml = viewports_from_space_yaml;
-exports.windows_from_space_yaml = windows_from_space_yaml;
+// Functions for working with space definitions
+exports.validate_viewports_attributes = validate_viewports_attributes;
+exports.validate_windows_attributes = validate_windows_attributes;
+exports.validate_space_attributes = validate_space_attributes;
+exports.validate_space_defn = validate_space_defn;
+exports.viewports_from_space_defn = viewports_from_space_defn;
+exports.windows_from_space_defn = windows_from_space_defn;
+
+// Conversion
+exports.convert_roomfeldscreen_to_space = convert_roomfeldscreen_to_space;
 
 // Functions for working with feld/screen proteins
-exports.convert_roomfeldscreen_to_space = convert_roomfeldscreen_to_space;
 exports.viewports_from_screen_protein = viewports_from_screen_protein;
 exports.windows_from_feld_protein = windows_from_feld_protein;
+exports.window_names_from_feld_protein = window_names_from_feld_protein;
 exports.viewports_from_kombi = viewports_from_kombi;
+exports.is_kombifeld_protein = is_kombifeld_protein;
 exports.is_screen_protein = is_screen_protein;
 exports.is_feld_protein = is_feld_protein;
-exports.is_kombifeld_protein = is_kombifeld_protein;
+exports.is_room_protein = is_room_protein;
 exports.fold_kombi_info_into = fold_kombi_info_into;
-exports.window_names_from_feld_protein = window_names_from_feld_protein;
 
 // room.protein functions
 exports.space_from_room_protein = space_from_room_protein
