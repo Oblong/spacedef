@@ -53,6 +53,35 @@ describe('** Space defn validator functions ******************* ', () => {
     expect(s.validate_space_attributes(undefined, 'foo')).to.be.false;
     expect(s.validate_space_attributes('bar')).to.be.false;
     expect(s.validate_space_attributes({}, [])).to.be.false;
+    expect(s.validate_space_attributes({'machines': []})).to.be.false;
+    expect(s.validate_space_attributes({'machines': []}, {})).to.be.false;
+    expect(s.validate_space_attributes({'machines': false}, {})).to.be.false;
+    expect(s.validate_space_attributes({'machines': null}, {})).to.be.false;
+    expect(s.validate_space_attributes({'foo': 5}, {})).to.be.false;
+    expect(s.validate_space_attributes({'machines': ['foo']}, {})).to.be.false;
+    expect(s.validate_space_attributes(
+      {'machines': [{name: 'foo'}]}, {})).to.be.false;
+    expect(s.validate_space_attributes(
+      {'machines': [{name: 'foo', windows: false}]}, {})).to.be.false;
+    expect(s.validate_space_attributes(
+      {'machines': [{name: 'foo', windows: []}]}, {})).to.be.false;
+    expect(s.validate_space_attributes(
+      {'machines': [{name: 'foo', windows: false}, 
+                    {name: 'bar', windows: false}]}, {})).to.be.false;
+    expect(s.validate_space_attributes(
+      {'machines': [{name: 'foo', windows: ['foowindow']}, 
+                    {name: 'bar', windows: false}]}, {})).to.be.false;
+    expect(s.validate_space_attributes(
+      {'machines': [{name: 'foo', windows: ['foowindow']}, 
+                    {name: 'bar', windows: []}]}, 
+      {foowindow: {}})).to.be.false;
+    expect(s.validate_space_attributes(
+      {'machines': [{name: 'foo', windows: ['foowindow']}]}, 
+      {foowindow: {}})).to.be.true;
+    expect(s.validate_space_attributes(
+      {'machines': [{name: 'foo', windows: ['foowindow']}, 
+                    {name: 'bar', windows: ['barwindow']}]}, 
+      {foowindow: {}, barwindow: {}})).to.be.tru;
   });
 
   it('checks good and bad test-data', () => { 

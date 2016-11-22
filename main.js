@@ -112,7 +112,7 @@ function validate_windows_attributes(windows, viewports) {
         }
 
     });
-   return windows_ok;
+    return windows_ok;
 }
 
 
@@ -140,13 +140,17 @@ function validate_space_attributes(space, windows) {
     }
 
     if (!_.isArray(space.machines)) {
-        console.log('machines list is not a list.');
+        console.log('Machines list is not a list.');
         return false;
     }
 
     let ms = i.List(space.machines);
     if (ms.size == 0) {
-        console.log('machines list is empty.');
+        console.log('Machines list is empty.');
+        return false;
+    }
+    if (!_.isObject(ms.get(0))) {
+        console.log('Machines list item is not an object.');
         return false;
     }
 
@@ -156,6 +160,18 @@ function validate_space_attributes(space, windows) {
 
     // Vet every window entry
     ms.forEach((m, key) => {
+        if (!m.name) {
+            console.log("Machine definition lacks 'name' attribute.");
+            space_ok = false;
+            return;
+        }
+        if (!m.windows || !_.isArray(m.windows) || m.windows.length == 0) {
+            console.log("Machine definition '", m.name,
+                "' lacks 'windows' list.");
+            space_ok = false;
+            return;
+        }
+
         if (m.principal)
             principal_count += 1;
 
