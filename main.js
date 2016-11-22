@@ -7,18 +7,18 @@ var _ = require('lodash');
 //  - 'defaults' key is present but nothing else
 function validate_viewports_attributes(viewports) {
     if (!_.isObject(viewports)) {
-        console.log('viewports attributes map is not a map.');
+        console.log('Viewports attributes map is not a map.');
         return false;
     }
 
-    let viewport_map = i.Map(viewports);
+    let viewports_map = i.Map(viewports);
 
     if (viewports_map.size == 0) {
         console.log('No viewports defined.');
         return false;
     }
 
-    if (viewports_map.includes('defaults') && viewports_map.size == 1) {
+    if (viewports_map.has('defaults') && viewports_map.size == 1) {
         console.log('No viewports defined, just some default attributes.');
         return false;
     }
@@ -33,13 +33,15 @@ function validate_viewports_attributes(viewports) {
 //    in in the viewports collection
 function validate_windows_attributes(windows, viewports) {
     if (!_.isObject(windows)) {
-        console.log('windows attributes map is not a map.');
+        console.log('Windows attributes map is not a map.');
+        return false;
     }
     if (!_.isObject(viewports)) {
-        console.log('viewports attributes map is not a map.');
+        console.log('Viewports attributes map is not a map.');
+        return false;
     }
 
-    let viewport_map = i.Map(viewports);
+    let viewports_map = i.Map(viewports);
     let windows_map = i.Map(windows);
 
     if (windows_map.size == 0) {
@@ -47,13 +49,13 @@ function validate_windows_attributes(windows, viewports) {
         return false;
     }
 
-    if (viewports_map.size == 0) {
-        console.log('No viewports defined.');
+    if (windows_map.has('defaults') && windows_map.size == 1) {
+        console.log('No windows defined, just some default attributes.');
         return false;
     }
 
-    if (windows_map.includes('defaults') && windows_map.size == 1) {
-        console.log('No windows defined, just some default attributes.');
+    if (viewports_map.size == 0) {
+        console.log('No viewports defined.');
         return false;
     }
 
@@ -74,7 +76,7 @@ function validate_windows_attributes(windows, viewports) {
         // Each window must specify viewports list (or a string)
         if (_.isString(w.viewports)) {
 
-            if (!viewport_map.has(w.viewports)) {
+            if (!viewports_map.has(w.viewports)) {
                 console.log('Window definition [', key,
                     '] refers to a viewport which is missing from the viewports collection: ',
                     w.viewports);
@@ -93,24 +95,24 @@ function validate_windows_attributes(windows, viewports) {
 
             // Select for viewport names which DON'T appear previously.
             let missings = viewport_names.valueSeq().filter(nom => !
-                viewport_map.has(nom)).toJS();
+                viewports_map.has(nom)).toJS();
 
             // Each item in viewports list must appear in prior viewports collection.
             if (missings.length > 0) {
-                console.log('window definition [', key,
+                console.log('Window definition [', key,
                     '] refers to viewport(s) which are missing from the viewports collection: ',
                     missings);
                 windows_ok = false;
             }
 
         } else {
-            console.log('window defn [', key,
+            console.log('Window definition [', key,
                 '] viewports attribute is not array or string.');
             windows_ok = false;
         }
 
     });
-    return windows_ok;
+   return windows_ok;
 }
 
 
@@ -121,10 +123,12 @@ function validate_windows_attributes(windows, viewports) {
 // TODO: assume that windows is already valid?  Validate it here?
 function validate_space_attributes(space, windows) {
     if (!_.isObject(space)) {
-        console.log('space attributes map is not a map.');
+        console.log('Space attributes map is not a map.');
+        return false;
     }
     if (!_.isObject(windows)) {
-        console.log('windows attributes map is not a map.');
+        console.log('Windows attributes map is not a map.');
+        return false;
     }
 
     let space_map = i.Map(space);
@@ -135,12 +139,12 @@ function validate_space_attributes(space, windows) {
         return false;
     }
 
-    if (!_.isArray(o.space.machines)) {
+    if (!_.isArray(space.machines)) {
         console.log('machines list is not a list.');
         return false;
     }
 
-    let ms = i.List(o.space.machines);
+    let ms = i.List(space.machines);
     if (ms.size == 0) {
         console.log('machines list is empty.');
         return false;
@@ -148,7 +152,7 @@ function validate_space_attributes(space, windows) {
 
     let space_ok = true;
     let principal_count = 0;
-    let ws = i.Map(o.windows);
+    let ws = i.Map(windows);
 
     // Vet every window entry
     ms.forEach((m, key) => {
@@ -185,22 +189,20 @@ function validate_space_attributes(space, windows) {
 //  - space is present, but viewports or windows not present
 //  - any section doesn't validate using functions defined above
 function validate_space_defn(o) {
-    console.log('Validating space definition.');
-
     if (!_.isObject(o)) {
-        console.log('space definition map is not a map.');
+        console.log('Space definition map is not a map.');
         return false;
     }
 
     let defn = i.Map(o);
     if (defn.size == 0) {
-        console.log('space definition empty.');
+        console.log('Space definition empty.');
         return false;
     }
 
     if (defn.has('windows')) {
         if (!defn.has('viewports')) {
-            console.log('"windows" section requires a viewports section.');
+            console.log('"windows" section requires a separate viewports collection.');
             return false;
         }
 
