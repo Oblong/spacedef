@@ -81,7 +81,19 @@ describe('** Space defn validator functions ******************* ', () => {
     expect(s.validate_space_attributes(
       {'machines': [{name: 'foo', windows: ['foowindow']}, 
                     {name: 'bar', windows: ['barwindow']}]}, 
-      {foowindow: {}, barwindow: {}})).to.be.tru;
+      {foowindow: {}, barwindow: {}})).to.be.true;
+    expect(s.validate_space_attributes(
+      {'machines': [{name: 'foo', windows: ['foowindow'], principal: true}, 
+                    {name: 'bar', windows: ['barwindow']}]}, 
+      {foowindow: {}, barwindow: {}})).to.be.true;
+    expect(s.validate_space_attributes(
+      {'machines': [{name: 'foo', windows: ['foowindow'], principal: true}, 
+                    {name: 'bar', windows: ['barwindow'], principal: false}]}, 
+      {foowindow: {}, barwindow: {}})).to.be.true;
+    expect(s.validate_space_attributes(
+      {'machines': [{name: 'foo', windows: ['foowindow'], principal: true}, 
+                    {name: 'bar', windows: ['barwindow'], principal: true}]}, 
+      {foowindow: {}, barwindow: {}})).to.be.false;
   });
 
   it('checks good and bad test-data', () => { 
