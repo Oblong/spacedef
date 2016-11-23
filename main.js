@@ -1,6 +1,7 @@
-let vec = require('javlin-pure');
-var i = require('immutable');
-var _ = require('lodash');
+const vec = require('javlin-pure');
+const i = require('immutable');
+const _ = require('lodash');
+const harmonize = require('./vectortrio.js').harmonize;
 
 // Returns false if:
 //  - arg null, undefined, not a map, or an empty map
@@ -242,29 +243,39 @@ function validate_space_defn(o) {
     return true;
 }
 
-// Given a JSON representation of a space.yaml file, 
-// returns a map of viewport definitions conforming to
-// space.yaml 'viewports' definition.
-// If there are "defaults" present, they'll be copied into all entries 
-// in the collection (overriden by more-local attributes).
+// Given a space definition returns a valid map of viewport definitions 
+// with all defaults installed but overriden by any local attributes.
 // Global defaults instantiated the same way.
-// If there is no 'viewports' entry at all, a 'defaultviewport'
-// will be returned.
+// norm / over / up vectors are harmonized and any missing filled in.
+// If there is no 'viewports' entry at all, returns a map with one 
+// 'defaultviewport' in it.
+// Any "defaults" section is not returned.
 function viewports_from_space_defn(y) {
-    if (!y || !y.viewports)
+    if (!y || !y.viewports || !_.isObject(y.viewports) || !validate_viewports_attributes(y.viewports))
         return {
             defaultviewport: default_viewport()
         };
 
     let input = i.Map(y.viewports);
+    let global_defaults = i.Map(default_viewport());
 
     // instantiate defaults in each entry; local attributes override defaults
     let specifed_defaults = i.Map(input.get('defaults'));
-    input = input.map(v => specifed_defaults.merge(v));
+    let user_settings = input.map(v => { 
+        let with_defaults = specifed_defaults.merge(v);
+        console.log("with_defaults = ", with_defaults);
+        let w = with_defaults.toJS();
+        let normoverup = harmonize(w.norm, w.over, w.up);
+        console.log('normoverup=', normoverup);
+        return with_defaults.merge(i.Map(normoverup));
+    });
 
-    // instantiate platform defaults in each entry; local overrides global
-    let global_defaults = i.Map(default_viewport());
-    return input.map(v => global_defaults.merge(v)).toJS();
+    // flesh out each entry with platform defaults
+    let final_settings = user_settings.map(v => global_defaults.merge(v));
+    final_settings = final_settings.delete('defaults');
+
+    console.log('final_settings=', final_settings.toJS());
+    return final_settings.toJS();
 }
 
 // Given a JSON representation of a space.yaml file, 
@@ -555,6 +566,7 @@ function default_viewport() {
     return {
         cent: [0, 0, -2000],
         norm: [0, 0, 1],
+        over: [1, 0, 0],
         up: [0, 1, 0],
         sizepx: [1920, 1080],
         sizemm: [1920, 1080],

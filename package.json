@@ -1,19 +1,22 @@
 {
-    "name": "spacedef",
-    "version": "1.1.1",
-    "description": "Functions for working with feld/screen/room proteins and spacefiles",
-    "main": "main.js",
-    "scripts": {
-        "test": "./node_modules/.bin/mocha --reporter spec"
-    },
-    "author": "Brandon Harvey",
-    "devDependencies": {
-        "chai": "^3.5.0",
-        "mocha": "^3.1.2"
-    },
-    "dependencies": {
-        "immutable": "^3.8.1",
-        "javlin-pure": "0.0.1",
-        "lodash": "^4.17.2"
-    }
+  "name": "spacedef",
+  "version": "1.1.1",
+  "description": "Functions for working with feld/screen/room proteins and spacefiles",
+  "main": "main.js",
+  "scripts": {
+    "test": "./node_modules/.bin/mocha --reporter spec"
+  },
+  "author": "Brandon Harvey",
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "chai-immutable": "^1.6.0",
+    "mocha": "^3.1.2"
+  },
+  "dependencies": {
+    "chai-immutable": "^1.6.0",
+    "immutable": "^3.8.1",
+    "javlin-pure": "0.0.1",
+    "lodash": "^4.17.2",
+    "sparkler": "^0.3.5"
+  }
 }
