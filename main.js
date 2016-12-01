@@ -8,19 +8,19 @@ const harmonize = require('./vectortrio.js').harmonize;
 //  - 'defaults' key is present but nothing else
 function validate_viewports_attributes(viewports) {
     if (!_.isObject(viewports)) {
-        console.log('Viewports attributes map is not a map.');
+        console.error('Viewports attributes map is not a map.');
         return false;
     }
 
     let viewports_map = i.Map(viewports);
 
     if (viewports_map.size == 0) {
-        console.log('No viewports defined.');
+        console.error('No viewports defined.');
         return false;
     }
 
     if (viewports_map.has('defaults') && viewports_map.size == 1) {
-        console.log('No viewports defined, just some default attributes.');
+        console.error('No viewports defined, just some default attributes.');
         return false;
     }
     return true;
@@ -34,11 +34,11 @@ function validate_viewports_attributes(viewports) {
 //    in in the viewports collection
 function validate_windows_attributes(windows, viewports) {
     if (!_.isObject(windows)) {
-        console.log('Windows attributes map is not a map.');
+        console.error('Windows attributes map is not a map.');
         return false;
     }
     if (!_.isObject(viewports)) {
-        console.log('Viewports attributes map is not a map.');
+        console.error('Viewports attributes map is not a map.');
         return false;
     }
 
@@ -46,17 +46,17 @@ function validate_windows_attributes(windows, viewports) {
     let windows_map = i.Map(windows);
 
     if (windows_map.size == 0) {
-        console.log('No windows defined.');
+        console.error('No windows defined.');
         return false;
     }
 
     if (windows_map.has('defaults') && windows_map.size == 1) {
-        console.log('No windows defined, just some default attributes.');
+        console.error('No windows defined, just some default attributes.');
         return false;
     }
 
     if (viewports_map.size == 0) {
-        console.log('No viewports defined.');
+        console.error('No viewports defined.');
         return false;
     }
 
@@ -68,7 +68,7 @@ function validate_windows_attributes(windows, viewports) {
 
         // must have viewports attribute
         if (_.isNil(w.viewports)) {
-            console.log('Window definition [', key,
+            console.error('Window definition [', key,
                 '] lacks viewports attribute.');
             windows_ok = false;
             return;
@@ -78,7 +78,7 @@ function validate_windows_attributes(windows, viewports) {
         if (_.isString(w.viewports)) {
 
             if (!viewports_map.has(w.viewports)) {
-                console.log('Window definition [', key,
+                console.error('Window definition [', key,
                     '] refers to a viewport which is missing from the viewports collection: ',
                     w.viewports);
                 windows_ok = false;
@@ -86,7 +86,7 @@ function validate_windows_attributes(windows, viewports) {
 
         } else if (_.isArray(w.viewports)) {
             if (w.viewports.length == 0) {
-                console.log('Window definition [', key,
+                console.error('Window definition [', key,
                     '] viewports array length is 0.');
                 windows_ok = false;
                 return;
@@ -100,14 +100,14 @@ function validate_windows_attributes(windows, viewports) {
 
             // Each item in viewports list must appear in prior viewports collection.
             if (missings.length > 0) {
-                console.log('Window definition [', key,
+                console.error('Window definition [', key,
                     '] refers to viewport(s) which are missing from the viewports collection: ',
                     missings);
                 windows_ok = false;
             }
 
         } else {
-            console.log('Window definition [', key,
+            console.error('Window definition [', key,
                 '] viewports attribute is not array or string.');
             windows_ok = false;
         }
@@ -124,11 +124,11 @@ function validate_windows_attributes(windows, viewports) {
 // TODO: assume that windows is already valid?  Validate it here?
 function validate_space_attributes(space, windows) {
     if (!_.isObject(space)) {
-        console.log('Space attributes map is not a map.');
+        console.error('Space attributes map is not a map.');
         return false;
     }
     if (!_.isObject(windows)) {
-        console.log('Windows attributes map is not a map.');
+        console.error('Windows attributes map is not a map.');
         return false;
     }
 
@@ -136,22 +136,22 @@ function validate_space_attributes(space, windows) {
     let windows_map = i.Map(windows);
 
     if (space_map.size == 0) {
-        console.log('Space attributes map empty.');
+        console.error('Space attributes map empty.');
         return false;
     }
 
     if (!_.isArray(space.machines)) {
-        console.log('Machines list is not a list.');
+        console.error('Machines list is not a list.');
         return false;
     }
 
     let ms = i.List(space.machines);
     if (ms.size == 0) {
-        console.log('Machines list is empty.');
+        console.error('Machines list is empty.');
         return false;
     }
     if (!_.isObject(ms.get(0))) {
-        console.log('Machines list item is not an object.');
+        console.error('Machines list item is not an object.');
         return false;
     }
 
@@ -162,12 +162,12 @@ function validate_space_attributes(space, windows) {
     // Vet every window entry
     ms.forEach((m, key) => {
         if (!m.name) {
-            console.log("Machine definition lacks 'name' attribute.");
+            console.error("Machine definition lacks 'name' attribute.");
             space_ok = false;
             return;
         }
         if (!m.windows || !_.isArray(m.windows) || m.windows.length == 0) {
-            console.log("Machine definition '", m.name,
+            console.error("Machine definition '", m.name,
                 "' lacks 'windows' list.");
             space_ok = false;
             return;
@@ -184,7 +184,7 @@ function validate_space_attributes(space, windows) {
         // Each item in a machine's windows list must appear in 
         // windows collection.
         if (missings.length > 0) {
-            console.log('Machine definition [', m.name,
+            console.error('Machine definition [', m.name,
                 '] refers to window(s) which are missing from the windows collection: ',
                 missings);
             space_ok = false;
@@ -193,7 +193,7 @@ function validate_space_attributes(space, windows) {
     });
 
     if (principal_count > 1) {
-        console.log('More than one machine marked as principal');
+        console.error('More than one machine marked as principal');
         return false;
     }
     return space_ok;
@@ -207,19 +207,19 @@ function validate_space_attributes(space, windows) {
 //  - any section doesn't validate using functions defined above
 function validate_space_defn(o) {
     if (!_.isObject(o)) {
-        console.log('Space definition map is not a map.');
+        console.error('Space definition map is not a map.');
         return false;
     }
 
     let defn = i.Map(o);
     if (defn.size == 0) {
-        console.log('Space definition empty.');
+        console.error('Space definition empty.');
         return false;
     }
 
     if (defn.has('windows')) {
         if (!defn.has('viewports')) {
-            console.log('"windows" section requires a separate viewports collection.');
+            console.error('"windows" section requires a separate viewports collection.');
             return false;
         }
 
@@ -232,7 +232,7 @@ function validate_space_defn(o) {
 
     if (defn.has('space')) {
         if (!defn.has('windows')) {
-            console.log('"space" section requires a windows section.');
+            console.error('"space" section requires a windows section.');
             return false;
         }
 
@@ -251,7 +251,8 @@ function validate_space_defn(o) {
 // 'defaultviewport' in it.
 // Any "defaults" section is not returned.
 function viewports_from_space_defn(y) {
-    if (!y || !y.viewports || !_.isObject(y.viewports) || !validate_viewports_attributes(y.viewports))
+    if (!y || !y.viewports || !_.isObject(y.viewports) || !validate_viewports_attributes(
+            y.viewports))
         return {
             defaultviewport: default_viewport()
         };
@@ -261,12 +262,10 @@ function viewports_from_space_defn(y) {
 
     // instantiate defaults in each entry; local attributes override defaults
     let specifed_defaults = i.Map(input.get('defaults'));
-    let user_settings = input.map(v => { 
+    let user_settings = input.map(v => {
         let with_defaults = specifed_defaults.merge(v);
-        console.log("with_defaults = ", with_defaults);
         let w = with_defaults.toJS();
         let normoverup = harmonize(w.norm, w.over, w.up);
-        console.log('normoverup=', normoverup);
         return with_defaults.merge(i.Map(normoverup));
     });
 
@@ -274,7 +273,6 @@ function viewports_from_space_defn(y) {
     let final_settings = user_settings.map(v => global_defaults.merge(v));
     final_settings = final_settings.delete('defaults');
 
-    console.log('final_settings=', final_settings.toJS());
     return final_settings.toJS();
 }
 
@@ -308,20 +306,18 @@ function windows_from_space_defn(y) {
 // or null on error
 function convert_roomfeldscreen_to_space(room, feld, screen) {
     if (!screen || !is_screen_protein(screen)) {
-        console.log("Not a valid screen protein:", screen);
+        console.error("Not a valid screen protein:", screen);
         return null;
     } else if (!feld || !is_feld_protein(feld)) {
-        console.log("Not a valid feld protein:", feld);
+        console.error("Not a valid feld protein:", feld);
         return null;
     } else if (!room || !is_room_protein(room)) {
-        console.log("Not a valid room protein:", room);
+        console.error("Not a valid room protein:", room);
         return null;
     }
 
-    console.log("Processing screen protein.");
     let viewports = viewports_from_screen_protein(screen);
 
-    console.log("Processing room protein.");
     let space = space_from_room_protein(room);
     let this_machine_name = room.ingests['this-machine'];
     let this_machine_index = 0;
@@ -336,7 +332,6 @@ function convert_roomfeldscreen_to_space(room, feld, screen) {
     let windows;
 
     if (is_kombifeld_protein(feld)) {
-        console.log("Processing kombi feld protein.");
 
         // Gather viewport pixel size and offset info from kombi protein
         // fold into viewport list
@@ -353,7 +348,6 @@ function convert_roomfeldscreen_to_space(room, feld, screen) {
         space.machines[this_machine_index].windows = ['all'];
 
     } else if (is_feld_protein(feld)) {
-        console.log("Processing (regular) feld protein.");
         windows = windows_from_feld_protein(feld);
 
         // In feld/screen setups, we only define one machine, machine 0.
@@ -546,7 +540,6 @@ function space_from_room_protein(p) {
     let room_settings = i.Map({
         multimachine: r.get('room-enabled'),
         timeout: r.get('sync-timeout'),
-        wands: r.get('wands-pool'),
         machines: r.get('machines-in-room').map(m => {
             let machine_info = {
                 name: m,
@@ -557,6 +550,10 @@ function space_from_room_protein(p) {
             return machine_info;
         })
     });
+
+    if (r.get('wands-pool')) {
+        room_settings = room_settings.put('wands', r.get('wands-pool'));
+    }
 
     return global_defaults.merge(room_settings).toJS();
 }
@@ -601,6 +598,19 @@ function default_space() {
     };
 }
 
+function default_room() {
+    return {
+        descrips: 'room-configuration',
+        ingests: {
+            principal: 'localhost',
+            'room-enabled': false,
+            'this-machine': 'localhost',
+            'sync-timeout': 300,
+            'machines-in-room': [ 'localhost' ]
+        }
+    };
+}
+
 // Functions for working with space definitions
 exports.validate_viewports_attributes = validate_viewports_attributes;
 exports.validate_windows_attributes = validate_windows_attributes;
@@ -630,3 +640,4 @@ exports.space_from_room_protein = space_from_room_protein
 exports.default_viewport = default_viewport;
 exports.default_window = default_window;
 exports.default_space = default_space;
+exports.default_room = default_room;
