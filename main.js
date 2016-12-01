@@ -1,3 +1,5 @@
+// (c) oblong industries
+
 const vec = require('javlin-pure');
 const i = require('immutable');
 const _ = require('lodash');

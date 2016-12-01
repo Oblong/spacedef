@@ -1,3 +1,5 @@
+// (c) oblong industries
+
 const _ = require('lodash');
 
 function cross3(v1, v2) {
