@@ -552,13 +552,13 @@ function space_from_room_protein(p) {
     });
 
     if (r.get('wands-pool')) {
-        room_settings = room_settings.put('wands', r.get('wands-pool'));
+        room_settings = room_settings.set('wands', r.get('wands-pool'));
     }
 
     return global_defaults.merge(room_settings).toJS();
 }
 
-// Defaults as defined in space.yaml
+// Defaults according to space definition spec
 function default_viewport() {
     return {
         cent: [0, 0, -2000],
@@ -573,7 +573,7 @@ function default_viewport() {
     };
 }
 
-// Defaults as defined in space.yaml
+// Defaults according to space definition spec
 function default_window() {
     return {
         sizepx: [1920, 1080],
@@ -584,7 +584,7 @@ function default_window() {
     };
 }
 
-// Defaults as defined in space.yaml
+// Defaults according to space definition spec
 function default_space() {
     return {
         multimachine: false,
