@@ -1,6 +1,6 @@
 {
   "name": "spacedef",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Functions for working with feld/screen/room proteins and spacefiles",
   "main": "main.js",
   "scripts": {
@@ -16,7 +16,6 @@
     "chai-immutable": "^1.6.0",
     "immutable": "^3.8.1",
     "javlin-pure": "0.0.1",
-    "lodash": "^4.17.2",
-    "sparkler": "^0.3.5"
+    "lodash": "^4.17.2"
   }
 }
