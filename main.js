@@ -570,7 +570,6 @@ function default_viewport() {
         sizepx: [1920, 1080],
         sizemm: [1920, 1080],
         eye: [0, 0, 0],
-        cameratype: 'perspective',
         offsetpx: [0, 0]
     };
 }
@@ -580,8 +579,6 @@ function default_window() {
     return {
         sizepx: [1920, 1080],
         offsetpx: [0, 0],
-        transparent: false,
-        titlebar: false,
         viewports: ['defaultviewport']
     };
 }

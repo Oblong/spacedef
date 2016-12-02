@@ -212,23 +212,25 @@ describe('** Space defn validator functions ******************* ', () => {
       {foo: default_vp});
 
     let fooish_vp = Object.assign({}, default_vp);
-    fooish_vp.cameratype = 'fooish';
+    fooish_vp.attrib = 'fooish';
+    let barish_vp = Object.assign({}, default_vp);
+    barish_vp.attrib = 'barish';
 
     assert.deepEqual(s.viewports_from_space_defn(
-      {'viewports': {'foo': {'cameratype': 'fooish'}, 'bar': {} }}),
+      {'viewports': {'foo': {'attrib': 'fooish'}, 'bar': {} }}),
       {foo: fooish_vp, bar: default_vp});
 
     assert.deepEqual(s.viewports_from_space_defn(
-      {'viewports': {'foo': {'cameratype': 'fooish'}, 'bar': {}, 'defaults': {'cameratype': 'perspective'} }}),
-      {foo: fooish_vp, bar: default_vp});
+      {'viewports': {'foo': {'attrib': 'fooish'}, 'bar': {}, 'defaults': {'attrib': 'barish'} }}),
+      {foo: fooish_vp, bar: barish_vp});
 
     assert.deepEqual(s.viewports_from_space_defn(
-      {'viewports': {'foo': {}, 'bar': {}, 'defaults': {'cameratype': 'fooish'} }}),
+      {'viewports': {'foo': {}, 'bar': {}, 'defaults': {'attrib': 'fooish'} }}),
       {foo: fooish_vp, bar: fooish_vp});
 
     assert.deepEqual(s.viewports_from_space_defn(
-      {'viewports': {'foo': {}, 'bar': {'cameratype': 'perspective'}, 'defaults': {'cameratype': 'fooish'} }}),
-      {foo: fooish_vp, bar: default_vp});
+      {'viewports': {'foo': {}, 'bar': {'attrib': 'barish'}, 'defaults': {'attrib': 'fooish'} }}),
+      {foo: fooish_vp, bar: barish_vp});
 
     let upsidedown_vp = Object.assign({}, default_vp);
     upsidedown_vp.up = [0,-1,0];
