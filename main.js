@@ -455,7 +455,6 @@ function is_kombifeld_protein(p) {
 
 // Returns true if JSON representation matches valid screen protein
 function is_screen_protein(p) {
-    console.log('check ', p);
     return (_.isObject(p) && _.has(p, ['ingests', 'screens']) &&
         Object.keys(p.ingests.screens).length > 0);
 }
@@ -484,19 +483,17 @@ function viewport_attributes_from_screen(attributes) {
     if (attributes.cent)
         o.cent = attributes.cent;
 
-    //  TODO: defaulting logic for norm/over/up
-    if (attributes.norm)
-        o.norm = attributes.norm;
-    if (attributes.up)
-        o.up = attributes.up;
-    if (attributes.over)
-        o.over = attributes.over;
+    let nou = harmonize(attributes.norm, attributes.over, attributes.up);
+    o.norm = nou.norm;
+    o.up = nou.up;
+    o.over = nou.over;
 
     if (attributes['px-size'])
         o.sizepx = attributes['px-size'];
     if (attributes['phys-size'])
         o.sizemm = attributes['phys-size'];
     if (attributes['eye-dist']) {
+        console.log('o so far:', o);
         let to_cam = vec.scale(o.norm, attributes['eye-dist']);
         o.eye = vec.add(o.cent, to_cam);
     }

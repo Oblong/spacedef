@@ -58,6 +58,7 @@ function from_over_up(over, up) {
 //  { norm, _,     _ }   => get default up [0 1 0], derive over (*common case*)
 //  { _,    over,  _ }   => get default up [0 1 0] derive norm
 //  { _,    _,     _ }   => get norm [0 0 1] up [0 1 0], derive over
+//  Returns an object with all of { norm, over, up } defined.
 function harmonize(norm, over, up) {
     //  handles cases where over is missing:
     //  { norm, _,    up }   => derives over
