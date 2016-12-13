@@ -8,8 +8,61 @@ var s = require('../main.js');
 var harmonize = require('../vectortrio.js').harmonize;
 var data = require('./test-data.js');
 
-describe('** Space defn validator functions ******************* ', () => {
-  
+describe('screen/feld validator functions ================', 
+  () => {
+
+  it('screens out empty and undefined screen proteins', () => {
+    assert(! s.is_feld_protein());
+    assert(! s.is_feld_protein(null));
+    assert(! s.is_feld_protein(undefined));
+    assert(! s.is_feld_protein(0));
+    assert(! s.is_feld_protein(''));
+    assert(! s.is_feld_protein({}));
+    assert(! s.is_feld_protein([]));
+    assert(! s.is_feld_protein({ingests: {}}));
+    assert(! s.is_feld_protein({ingests: { foo: 'bar' }}));
+    assert(s.is_feld_protein({ingests: { felds: {name: 'foo'} }}));
+
+    assert(! s.is_screen_protein());
+    assert(! s.is_screen_protein(null));
+    assert(! s.is_screen_protein(undefined));
+    assert(! s.is_screen_protein(0));
+    assert(! s.is_screen_protein(''));
+    assert(! s.is_screen_protein({}));
+    assert(! s.is_screen_protein([]));
+    assert(! s.is_screen_protein({ingests: {}}));
+    assert(! s.is_screen_protein({ingests: { foo: 'bar' }}));
+    assert(s.is_screen_protein({ingests: { screens: {name: 'foo'} }}));
+
+    assert(! s.is_kombifeld_protein());
+    assert(! s.is_kombifeld_protein(null));
+    assert(! s.is_kombifeld_protein(undefined));
+    assert(! s.is_kombifeld_protein(0));
+    assert(! s.is_kombifeld_protein(''));
+    assert(! s.is_kombifeld_protein({}));
+    assert(! s.is_kombifeld_protein([]));
+    assert(! s.is_kombifeld_protein({ingests: {}}));
+    assert(s.is_kombifeld_protein({ingests: { felds: { all: { type: 'kombi' } } }}));
+
+    assert(! s.is_room_protein());
+    assert(! s.is_room_protein(null));
+    assert(! s.is_room_protein(undefined));
+    assert(! s.is_room_protein(0));
+    assert(! s.is_room_protein(''));
+    assert(! s.is_room_protein({}));
+    assert(! s.is_room_protein([]));
+    assert(! s.is_room_protein({ingests: {}}));
+    assert(! s.is_room_protein({ingests: { foo: 'bar' }}));
+    assert(s.is_room_protein({ingests: { 'this-machine': 'foo', 
+                                        'principal': 'foo',
+                                        'machines-in-room': ['foo', 'bar'] }}));
+  });
+});
+
+
+describe('Space defn validator functions ===============', 
+  () => {
+
   it('validate_viewports_attributes catches malformed viewports definitions', () => { 
     expect(s.validate_viewports_attributes([])).to.be.false;
     expect(s.validate_viewports_attributes(null)).to.be.false;

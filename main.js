@@ -443,7 +443,7 @@ function viewports_from_kombi(p) {
 // returns true if it has the "all" + "kombi" signature 
 // indicating true wild kombifeld
 function is_kombifeld_protein(p) {
-    if (p && p.ingests && p.ingests.felds) {
+    if (_.isObject(p) && _.has(p, ['ingests', 'felds'])) {
         for (let nom in p.ingests.felds) {
             if (nom == "all" && p.ingests.felds.all.type == "kombi") {
                 return true;
@@ -455,21 +455,21 @@ function is_kombifeld_protein(p) {
 
 // Returns true if JSON representation matches valid screen protein
 function is_screen_protein(p) {
-    return (p && p.ingests && p.ingests.screens &&
+    console.log('check ', p);
+    return (_.isObject(p) && _.has(p, ['ingests', 'screens']) &&
         Object.keys(p.ingests.screens).length > 0);
 }
 
 // Returns true if JSON representation matches valid feld protein
 function is_feld_protein(p) {
-    return (p && p.ingests && p.ingests.felds &&
+    return (_.isObject(p) && _.has(p, ['ingests', 'felds']) &&
         Object.keys(p.ingests.felds).length > 0);
 }
 
 // Returns true if JSON representation matches valid screen protein
 function is_room_protein(p) {
-    return (p && p.ingests &&
-        p.ingests['this-machine'] &&
-        p.ingests['principal'] &&
+    return (_.isObject(p) && _.has(p, ['ingests', 'this-machine']) &&
+        _.has(p, ['ingests', 'principal']) &&
         Object.keys(p.ingests['machines-in-room']).length > 0);
 }
 
@@ -477,6 +477,9 @@ function is_room_protein(p) {
 // Assumes a 'name' attribute.
 function viewport_attributes_from_screen(attributes) {
     let o = default_viewport();
+    if (!_.isObject(attributes)) {
+        return o;
+    }
 
     if (attributes.cent)
         o.cent = attributes.cent;
@@ -605,7 +608,7 @@ function default_room() {
             'room-enabled': false,
             'this-machine': 'localhost',
             'sync-timeout': 300,
-            'machines-in-room': [ 'localhost' ]
+            'machines-in-room': ['localhost']
         }
     };
 }
