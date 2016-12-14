@@ -68,8 +68,17 @@ function validate_windows_attributes(windows, viewports) {
     // in case of failure
     windows_map.forEach((w, key) => {
 
-        // must have viewports attribute
+        //  'defaults' entry is special, it doesn't need most checks
+        if (key == 'defaults') {
+            if (!_.isObject(w)) {
+                windows_ok = false;
+            }
+            return;
+        }
+
+        // each entry must have viewports attribute
         if (_.isNil(w.viewports)) {
+        // if (_.isNil(w.viewports)) {
             console.error('Window definition [', key,
                 '] lacks viewports attribute.');
             windows_ok = false;

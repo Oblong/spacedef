@@ -80,6 +80,7 @@ describe('Space defn validator functions ===============',
     expect(s.validate_windows_attributes(undefined, 'foo')).to.be.false;
     expect(s.validate_windows_attributes('bar')).to.be.false;
     expect(s.validate_windows_attributes({}, [])).to.be.false;
+    expect(s.validate_windows_attributes({'defaults': {}})).to.be.false;
     expect(s.validate_windows_attributes({'defaults': {}}, {'a': {}})).to.be.false;
     expect(s.validate_windows_attributes({'win': {}})).to.be.false;
     expect(s.validate_windows_attributes({'win': {}}, {})).to.be.false;
@@ -103,6 +104,10 @@ describe('Space defn validator functions ===============',
     expect(s.validate_windows_attributes(
       {'win': { 'sizepx': [10,10], 'viewports': ['foo'] }},
       {'foo': {}})).to.be.true;
+    expect(s.validate_windows_attributes(
+      { 'win': { 'sizepx': [10,10], 'viewports': ['foo'] },
+        'defaults': { 'attrib': true } },
+      {'foo': {}} )).to.be.true;
   });
 
  it('validate_space_attributes catches malformed space definitions', () => { 
