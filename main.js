@@ -493,7 +493,6 @@ function viewport_attributes_from_screen(attributes) {
     if (attributes['phys-size'])
         o.sizemm = attributes['phys-size'];
     if (attributes['eye-dist']) {
-        console.log('o so far:', o);
         let to_cam = vec.scale(o.norm, attributes['eye-dist']);
         o.eye = vec.add(o.cent, to_cam);
     }
