@@ -6,6 +6,7 @@ var expect    = chai.expect;
 var assert    = chai.assert;
 var s = require('../main.js');
 var harmonize = require('../vectortrio.js').harmonize;
+var harmonize_and_normalize = require('../vectortrio.js').harmonize_and_normalize;
 var data = require('./test-data.js');
 
 describe('screen/feld validator functions ================', 
@@ -190,6 +191,18 @@ describe('Space defn validator functions ===============',
       assert.deepEqual(canon, harmonize({}, undefined, []));
       assert.deepEqual(canon, harmonize([], false));
   });
+
+  it('harmonize_and_normalize normalizes its input', () => { 
+    assert.deepEqual(canon, 
+                     harmonize_and_normalize([0,0,100], [100, 0, 0], [0,100,0]));
+    assert.deepEqual(canon, 
+                     harmonize_and_normalize([0,0,1], [100, 0, 0], [0,100000,0]));
+    assert.deepEqual(canon, 
+                     harmonize_and_normalize([0,0,1], [100, 0, 0]));
+    assert.deepEqual(canon, 
+                     harmonize_and_normalize([0,0,0.1]));
+  });
+
 
   it('harmonize handles norm/over/up input cases correctly', () => { 
     //  { norm, over, up }   => over will be modified to match norm/up

@@ -1,6 +1,7 @@
 // (c) oblong industries
 
 const _ = require('lodash');
+const vec = require('javlin-pure');
 
 function cross3(v1, v2) {
     return [
@@ -91,5 +92,14 @@ function harmonize(norm, over, up) {
     };
 }
 
+function harmonize_and_normalize(norm, over, up) {
+    let o = harmonize(norm, over, up);
+    return {
+        norm: vec.norm(o.norm),
+        over: vec.norm(o.over),
+        up: vec.norm(o.up)
+    };
+}
 
 exports.harmonize = harmonize;
+exports.harmonize_and_normalize = harmonize_and_normalize;

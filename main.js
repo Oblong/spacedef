@@ -3,7 +3,7 @@
 const vec = require('javlin-pure');
 const i = require('immutable');
 const _ = require('lodash');
-const harmonize = require('./vectortrio.js').harmonize;
+const harmonize_and_normalize = require('./vectortrio.js').harmonize_and_normalize;
 
 // Returns false if:
 //  - arg null, undefined, not a map, or an empty map
@@ -276,7 +276,7 @@ function viewports_from_space_defn(y) {
     let user_settings = input.map(v => {
         let with_defaults = specifed_defaults.merge(v);
         let w = with_defaults.toJS();
-        let normoverup = harmonize(w.norm, w.over, w.up);
+        let normoverup = harmonize_and_normalize(w.norm, w.over, w.up);
         return with_defaults.merge(i.Map(normoverup));
     });
 
@@ -492,7 +492,7 @@ function viewport_attributes_from_screen(attributes) {
     if (attributes.cent)
         o.cent = attributes.cent;
 
-    let nou = harmonize(attributes.norm, attributes.over, attributes.up);
+    let nou = harmonize_and_normalize(attributes.norm, attributes.over, attributes.up);
     o.norm = nou.norm;
     o.up = nou.up;
     o.over = nou.over;
